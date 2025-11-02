@@ -1,0 +1,344 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "guildIds": [
+          "1434379973103325336"
+        ],
+        "channelIds": [
+          "1434379973808099481"
+        ],
+        "pattern": "every",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-discord-trigger.discordTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "e6a3343f-2950-4a9d-b9b0-9d88876ef629",
+      "name": "Discord Trigger",
+      "credentials": {
+        "discordBotTriggerApi": {
+          "id": "cOBhXDMjnjnDXTUb",
+          "name": "Discord Bot Trigger account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const discordEpoch = 1420070400000;\n\n// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  const snowflake = item.json.id || item.json.message_id || item.json.data?.id;\n  \n  const ts = (BigInt(snowflake) >> 22n) + BigInt(discordEpoch);\n  item.json.readable_timestamp = new Date(Number(ts)).toLocaleString(\"en-PH\");\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "f1c3a4a9-654c-468b-bab0-8c808aba67ba",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1DKWByFyTeOnVNWSRw9S4G0nhPO0jUlOLyn9ya3id9OE",
+          "mode": "list",
+          "cachedResultName": "Personal Expense Tracker (Responses)",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DKWByFyTeOnVNWSRw9S4G0nhPO0jUlOLyn9ya3id9OE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 869619268,
+          "mode": "list",
+          "cachedResultName": "Form Responses 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1DKWByFyTeOnVNWSRw9S4G0nhPO0jUlOLyn9ya3id9OE/edit#gid=869619268"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{ $json.timestamp }}",
+            "Label": "={{ $json.label }}",
+            "Amount": "={{ $json.amount }}",
+            "Description": "={{ $json.description }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Label",
+              "displayName": "Label",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Amount",
+              "displayName": "Amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Description",
+              "displayName": "Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        976,
+        -96
+      ],
+      "id": "a5d68457-4bda-4df7-9d97-739b9b8ec6c8",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "QRULH72Orwnwp1Vl",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "var output;\n// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  output = JSON.parse(item.json.output);\n}\n\nreturn output"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        736,
+        -160
+      ],
+      "id": "5db74b45-96a2-4299-9a46-45412bcc5a75",
+      "name": "Code in JavaScript1",
+      "retryOnFail": false,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Extract the following details from the message and output only valid JSON with no explanations.\n\nMessage:\n{{ $json.readable_timestamp }}\n{{ $json.content }}\n\nFields to extract:\n- Label (name of the expense)\n- Amount (number in PHP)\n- Description (short reason or category)\n- Timestamp (if provided, otherwise use today's date)\n\noutput format:\n{\n  \"timestamp\": \"string\",\n  \"label\": \"string\",\n  \"amount\": \"integer\",\n  \"description\": \"string\"\n}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        416,
+        16
+      ],
+      "id": "ec33df80-6e6e-4737-a76a-932df8024398",
+      "name": "AI Agent",
+      "retryOnFail": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "model": "llama3.2:1b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        272,
+        224
+      ],
+      "id": "c11ddc6d-07f9-44a1-84bf-148d8b827611",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "ZEkULsr2uDNOUAdH",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1434379973103325336",
+          "mode": "list",
+          "cachedResultName": "Personal Expenses",
+          "cachedResultUrl": "https://discord.com/channels/1434379973103325336"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1434379973808099481",
+          "mode": "list",
+          "cachedResultName": "general",
+          "cachedResultUrl": "https://discord.com/channels/1434379973103325336/1434379973808099481"
+        },
+        "content": "Error parsing message to valid JSON",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        928,
+        96
+      ],
+      "id": "19837855-408b-4923-b6e2-81a3f0381620",
+      "name": "Send a message",
+      "webhookId": "9de9a446-4d87-4249-8b7f-a89dd5a7a2b7",
+      "credentials": {
+        "discordBotApi": {
+          "id": "taF7eQ61jeAaD0K8",
+          "name": "Discord Bot account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "guildId": {
+          "__rl": true,
+          "value": "1434379973103325336",
+          "mode": "list",
+          "cachedResultName": "Personal Expenses",
+          "cachedResultUrl": "https://discord.com/channels/1434379973103325336"
+        },
+        "channelId": {
+          "__rl": true,
+          "value": "1434379973808099481",
+          "mode": "list",
+          "cachedResultName": "general",
+          "cachedResultUrl": "https://discord.com/channels/1434379973103325336/1434379973808099481"
+        },
+        "content": "=Expense recorded!\n\n {{ $json.Timestamp }}\n{{ $json.Label }} - PhP {{ $json.Amount }}\n{{ $json.Description }}\n\nExpenses sheet: https://docs.google.com/spreadsheets/d/1DKWByFyTeOnVNWSRw9S4G0nhPO0jUlOLyn9ya3id9OE/edit?usp=sharing",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.discord",
+      "typeVersion": 2,
+      "position": [
+        1152,
+        -80
+      ],
+      "id": "7f7db997-ad97-4f03-be6b-f326cf19355f",
+      "name": "Send a message1",
+      "webhookId": "9de9a446-4d87-4249-8b7f-a89dd5a7a2b7",
+      "credentials": {
+        "discordBotApi": {
+          "id": "taF7eQ61jeAaD0K8",
+          "name": "Discord Bot account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Discord Trigger": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "Asia/Manila",
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": -1,
+    "availableInMCP": false
+  },
+  "versionId": "e9cfd59c-609f-4058-9f9e-90fe51a3466d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "de7e7534918aefdf6db7074015bbb194a1c885b375088f5a27c9bc0c8ea35596"
+  },
+  "id": "s9QOTiLe417iAxdi",
+  "tags": []
+}
