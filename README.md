@@ -28,6 +28,8 @@ Lunch ₱250 chicken rice
 
 ## 📷 Preview
 ![Workflow Preview](https://github.com/Chigo042823/discord-google-sheets-expense-tracker-n8n/blob/main/src/preview1.png?raw=true)
+![Discord Preview](https://github.com/Chigo042823/discord-google-sheets-expense-tracker-n8n/blob/main/src/preview2.png?raw=true)
+![Sheets Preview](https://github.com/Chigo042823/discord-google-sheets-expense-tracker-n8n/blob/main/src/preview3.png?raw=true)
 
 ## 🧾 License
 MIT License
