@@ -24,12 +24,10 @@ When a message is sent in your personal Discord channel, n8n parses it with an L
 3. Test by sending a message like:
 Lunch ₱250 chicken rice
 
-css
-Copy code
 4. The bot replies with a concise AI summary and updates your sheet automatically.
 
 ## 📷 Preview
-![Workflow Preview](https://github.com/Chigo042823/discord-google-sheets-expense-tracker-n8n/src/preview1.jpg?raw=true)
+![Workflow Preview](https://github.com/Chigo042823/discord-google-sheets-expense-tracker-n8n/blob/main/src/preview1.png?raw=true)
 
 ## 🧾 License
 MIT License
